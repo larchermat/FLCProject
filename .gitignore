@@ -1,5 +1,8 @@
 Makefile
-*.c
-*.h
+lex.yy.c
+y.tab.c
+y.tab.h
+calc-yacc.*.c
+calc-yacc.*.h
 *.output
 *.out
