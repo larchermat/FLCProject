@@ -3,10 +3,11 @@
 
 #include <stdlib.h>
 #include <string.h>
+#define STRMAX 256
 
 struct symtab{
-    char* name;
-    char* type;
+    char name[STRMAX];
+    char type[STRMAX];
     float fvalue;
     int ivalue;
     struct symtab* next;
