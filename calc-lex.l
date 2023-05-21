@@ -16,6 +16,8 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 [ ]     { /* skip blanks */ }
 
 if      {return IF;}
+integer {return INTEGER;}
+dooble  {return DOOBLE;}
 {NUM}   {yylval.value = atof(yytext);
           return NUM;}
 {ID}    {yylval.lexeme = strdup(yytext);
@@ -29,6 +31,7 @@ if      {return IF;}
 ")"     {return ')';}
 "<"     {return '<';}
 ">"     {return '>';}
+"="     {return '=';}
 \n      {return '\n';}
 
 %%

@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include "list.h"
 
 void yyerror(const char *s)
 {
@@ -12,6 +13,7 @@ void yyerror(const char *s)
 }
 
 int yylex(void);
+struct symtab* table;
  
 %}
 
@@ -25,10 +27,15 @@ int yylex(void);
 %token <value>  NUM
 %token IF
 %token <lexeme> ID
+%token INTEGER
+%token DOOBLE
 
 %type <value> expr
 %type <condition> cond
+%type <lexeme> var
 
+%nonassoc '\n'
+%nonassoc '='
 %left '+' '-'
 %left '*' '/'
 %left '<' '>'
@@ -39,7 +46,6 @@ int yylex(void);
 %%
 //vardelo dio can
 line  : expr '\n'      {printf("Result: %5.2f\n", $1); exit(0);}
-      | ID             {printf("IDentifier: %s\n", $1); exit(0);}
       ;
 expr  : expr '+' expr  {$$ = $1 + $3;}
       | expr '-' expr  {$$ = $1 - $3;}
@@ -48,9 +54,20 @@ expr  : expr '+' expr  {$$ = $1 + $3;}
       | '(' expr ')'   {$$ = $2;}
       | IF '(' cond ')' expr expr  {$$ = $3 ? $5:$6;}
       | NUM            {$$ = $1;}
+      | var            {$$ = getFVal(table,$1);}
       ;
 cond  : expr '<' expr  {$$ = $1 < $3;}
       | expr '>' expr  {$$ = $1 > $3;}
+      ;
+var   : INTEGER ID NUM {table = add(table, $2, "int", $3);
+                        printf("Variable %s = %d\n", $2, getIVal(table,$2));
+                        $$ = $2;}
+      | DOOBLE ID NUM  {table = add(table, $2, "float", $3);
+                        printf("Variable %s = %2.2f\n", $2, getFVal(table,$2));
+                        $$ = $2;}
+      | var '=' expr   {table = update_val(table, $1, $3);
+                        $$ = $1;}
+      | ID             {$$ = $1;}
       ;
 
 %%
@@ -59,4 +76,5 @@ cond  : expr '<' expr  {$$ = $1 < $3;}
 	
 int main(void)
 {
+      table = NULL;
   return yyparse();}

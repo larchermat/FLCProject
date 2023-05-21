@@ -3,38 +3,29 @@
 #include <stdio.h>
 #include "list.h"
 
-struct symtab *create_table(char *name, char *type, float fval, int ival) {
-    FILE *file;
-    file = fopen("diocan.txt", "w");
-    fprintf(file, "Riga 7\n");
-    fclose(file);
-    file = fopen("diocan.txt", "w");
+struct symtab *create_table(char *name, char *type, float val) {
     struct symtab *table = (struct symtab *) malloc(sizeof(struct symtab));
     strcpy(table->name, name);
     strcpy(table->type, type);
-    fprintf(file, "Riga 11\n");
     if (strcmp(type, "int") == 0) {
-        table->ivalue = ival;
+        table->ivalue = (int) val;
     } else {
-        table->fvalue = fval;
+        table->fvalue = val;
     }
-    fprintf(file, "Riga 17\n");
     table->next = NULL;
-    fclose(file);
     return table;
 }
 
-void add(struct symtab *table, char *name, char *type, float fval, int ival) {
-    printf("Riga 23");
-    struct symtab *element = create_table(name, type, fval, ival);
-    printf("Riga 25");
+struct symtab *add(struct symtab *table, char *name, char *type, float val) {
+    struct symtab *element = create_table(name, type, val);
+    if (table == NULL) {
+        return element;
+    }
     struct symtab *s = table;
-    printf("Riga 27");
     if (strcmp(name, table->name) == 0) {
         printf("Dio cane non puoi avere gli stessi nomi");
         exit(1);
     }
-    printf("Riga 32");
     while (s->next != NULL) {
         if (strcmp(name, s->name) == 0) {
             printf("Dio cane non puoi avere gli stessi nomi");
@@ -42,33 +33,73 @@ void add(struct symtab *table, char *name, char *type, float fval, int ival) {
         }
         s = s->next;
     }
-    printf("Riga 40");
     s->next = element;
+    return table;
 }
 
 int getIVal(struct symtab *table, char *name) {
-    FILE *file;
-    file = fopen("diocan.txt", "w");
-    fprintf(file, "Riga 45\n");
     if (table == NULL) {
         printf("Mona dio can");
         exit(1);
     }
-    fprintf(file, "Riga 50\n");
     if (strcmp(table->name, name) == 0) {
         return table->ivalue;
     }
-    fprintf(file, "Riga 54\n");
     struct symtab *s = table;
     while (s != NULL && strcmp(name, s->name) != 0) {
         s = s->next;
     }
-    fprintf(file, "Riga 59\n");
     if (s == NULL) {
         printf("Non è stato trovato niente");
         exit(1);
     }
-    fprintf(file, "Riga 64\n");
-    fclose(file);
     return s->ivalue;
+}
+
+float getFVal(struct symtab *table, char *name){
+    if (table == NULL) {
+        printf("Mona dio can");
+        exit(1);
+    }
+    if (strcmp(table->name, name) == 0) {
+        return table->fvalue;
+    }
+    struct symtab *s = table;
+    while (s != NULL && strcmp(name, s->name) != 0) {
+        s = s->next;
+    }
+    if (s == NULL) {
+        printf("Non è stato trovato niente");
+        exit(1);
+    }
+    return s->fvalue;
+}
+
+struct symtab *update_val(struct symtab *table, char *name, float value){
+    if (table == NULL) {
+        printf("Mona dio can");
+        exit(1);
+    }
+    if (strcmp(table->name, name) == 0) {
+        if(strcmp(table->type,"float") == 0){
+            table->fvalue = value;
+        }else{
+            table->ivalue = (int) value;
+        }
+        return table;
+    }
+    struct symtab *s = table;
+    while (s != NULL && strcmp(name, s->name) != 0) {
+        s = s->next;
+    }
+    if (s == NULL) {
+        printf("Non è stato trovato niente");
+        exit(1);
+    }
+    if(strcmp(s->type,"float") == 0){
+        s->fvalue = value;
+    }else{
+        s->ivalue = (int) value;
+    }
+    return s;
 }
