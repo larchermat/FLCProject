@@ -1,0 +1,11 @@
+dooble x
+dooble y
+x = 10
+print x
+y = 5
+print y
+print
+dooble z
+print
+z = x + y
+print z

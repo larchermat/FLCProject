@@ -29,10 +29,14 @@ struct symtab* table;
 %token <lexeme> ID
 %token INTEGER
 %token DOOBLE
+%token PRINT
 
 %type <value> expr
 %type <condition> cond
-%type <lexeme> var
+%type <value> term
+%type <lexeme> statement
+%type <lexeme> assignment
+%type <lexeme> declaration
 
 %nonassoc '='
 %left '+' '-'
@@ -43,36 +47,43 @@ struct symtab* table;
 %start line
 
 %%
-line  : var '\n'       {;}
-      | expr '\n'      {;}
-      | line var '\n'  {;}
-      | line expr '\n' {;}
+line  : statement '\n' {;}
+      | line statement '\n'  {;}
       ;
-expr  : expr '+' expr  {$$ = $1 + $3;
-                        printf("Using expr -> expr + expr\n");}
+
+expr  : expr '+' expr  {$$ = $1 + $3;}
       | expr '-' expr  {$$ = $1 - $3;}
       | expr '*' expr  {$$ = $1 * $3;}
       | expr '/' expr  {$$ = $1 / $3;}
       | '(' expr ')'   {$$ = $2;}
-      | IF '(' cond ')' expr expr  {$$ = $3 ? $5:$6;}
-      | NUM            {$$ = $1;}
-      | var            {$$ = getFVal(table,$1);
-                        printf("Using expr -> var: var=%s and expr =%2.2f\n", $1, $$);}
+      | term           {$$ = $1;}
       ;
+
 cond  : expr '<' expr  {$$ = $1 < $3;}
       | expr '>' expr  {$$ = $1 > $3;}
       ;
-var   : INTEGER ID NUM {table = add(table, $2, "int", $3);
-                        printf("Variable %s = %d\n", $2, getIVal(table,$2));
-                        $$ = $2;}
-      | DOOBLE ID NUM  {table = add(table, $2, "float", $3);
-                        printf("Variable %s = %2.2f\n", $2, getFVal(table,$2));
-                        $$ = $2;}
-      | var '=' expr   {table = update_val(table, $1, $3);
-                        $$ = $1;
-                        printf("%s = %2.2f\n", $1, $3);}
-      | ID             {$$ = $1;}
+
+assignment  : ID '=' expr   {table = update_val(table, $1, $3);
+                              $$ = $1;}
       ;
+
+declaration : INTEGER ID {table = add(table, $2, "int", 0);
+                          printf("Variable %s = %d\n", $2, getIVal(table,$2));
+                          $$ = $2;}
+            | DOOBLE ID  {table = add(table, $2, "float", 0.0);
+                          printf("Variable %s = %2.2f\n", $2, getFVal(table,$2));
+                          $$ = $2;}
+      ;
+
+term  : NUM            {$$ = $1;}
+      | ID             {$$ = getFVal(table,$1);}
+      ;
+
+statement : assignment {;}
+          | declaration {;}
+          | PRINT ID {printf("%s = %2.2f\n", $2, getFVal(table,$2));}
+          | PRINT {print_list(table);}
+          ;
 
 %%
 

@@ -24,4 +24,6 @@ float getFVal(struct symtab *table, char *name);
 
 struct symtab *update_val(struct symtab *table, char *name, float value);
 
+void print_list(struct symtab *table);
+
 #endif
