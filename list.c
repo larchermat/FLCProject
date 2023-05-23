@@ -23,12 +23,12 @@ struct symtab *add(struct symtab *table, char *name, char *type, float val) {
     }
     struct symtab *s = table;
     if (strcmp(name, table->name) == 0) {
-        printf("Dio cane non puoi avere gli stessi nomi");
+        printf("Non puoi avere gli stessi nomi");
         exit(1);
     }
     while (s->next != NULL) {
         if (strcmp(name, s->name) == 0) {
-            printf("Dio cane non puoi avere gli stessi nomi");
+            printf("Non puoi avere gli stessi nomi");
             exit(1);
         }
         s = s->next;
@@ -39,7 +39,7 @@ struct symtab *add(struct symtab *table, char *name, char *type, float val) {
 
 int getIVal(struct symtab *table, char *name) {
     if (table == NULL) {
-        printf("Mona dio can");
+        printf("Errore");
         exit(1);
     }
     if (strcmp(table->name, name) == 0) {
@@ -50,7 +50,7 @@ int getIVal(struct symtab *table, char *name) {
         s = s->next;
     }
     if (s == NULL) {
-        printf("Non è stato trovato niente");
+        printf("Non è stato trovato niente per %s\n", name);
         exit(1);
     }
     return s->ivalue;
@@ -58,7 +58,7 @@ int getIVal(struct symtab *table, char *name) {
 
 float getFVal(struct symtab *table, char *name){
     if (table == NULL) {
-        printf("Mona dio can");
+        printf("Errore");
         exit(1);
     }
     if (strcmp(table->name, name) == 0) {
@@ -69,7 +69,7 @@ float getFVal(struct symtab *table, char *name){
         s = s->next;
     }
     if (s == NULL) {
-        printf("Non è stato trovato niente");
+        printf("Non è stato trovato niente per %s\n", name);
         exit(1);
     }
     return s->fvalue;
@@ -77,7 +77,7 @@ float getFVal(struct symtab *table, char *name){
 
 struct symtab *update_val(struct symtab *table, char *name, float value){
     if (table == NULL) {
-        printf("Mona dio can");
+        printf("Errore");
         exit(1);
     }
     if (strcmp(table->name, name) == 0) {
@@ -93,7 +93,7 @@ struct symtab *update_val(struct symtab *table, char *name, float value){
         s = s->next;
     }
     if (s == NULL) {
-        printf("Non è stato trovato niente");
+        printf("Non è stato trovato niente per %s\n", name);
         exit(1);
     }
     if(strcmp(s->type,"float") == 0){

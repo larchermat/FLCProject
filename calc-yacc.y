@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "list.h"
+#define FILENAME "input_file.txt"
 
 void yyerror(const char *s)
 {
@@ -17,7 +18,6 @@ struct symtab* table;
  
 %}
 
-//vardelo dio porco
 %union {
        char* lexeme;			//name of an identifier
        float value;			//attribute of a token of type NUM
@@ -34,7 +34,6 @@ struct symtab* table;
 %type <condition> cond
 %type <lexeme> var
 
-%nonassoc '\n'
 %nonassoc '='
 %left '+' '-'
 %left '*' '/'
@@ -44,17 +43,21 @@ struct symtab* table;
 %start line
 
 %%
-//vardelo dio can
-line  : expr '\n'      {printf("Result: %5.2f\n", $1); exit(0);}
+line  : var '\n'       {;}
+      | expr '\n'      {;}
+      | line var '\n'  {;}
+      | line expr '\n' {;}
       ;
-expr  : expr '+' expr  {$$ = $1 + $3;}
+expr  : expr '+' expr  {$$ = $1 + $3;
+                        printf("Using expr -> expr + expr\n");}
       | expr '-' expr  {$$ = $1 - $3;}
       | expr '*' expr  {$$ = $1 * $3;}
       | expr '/' expr  {$$ = $1 / $3;}
       | '(' expr ')'   {$$ = $2;}
       | IF '(' cond ')' expr expr  {$$ = $3 ? $5:$6;}
       | NUM            {$$ = $1;}
-      | var            {$$ = getFVal(table,$1);}
+      | var            {$$ = getFVal(table,$1);
+                        printf("Using expr -> var: var=%s and expr =%2.2f\n", $1, $$);}
       ;
 cond  : expr '<' expr  {$$ = $1 < $3;}
       | expr '>' expr  {$$ = $1 > $3;}
@@ -66,7 +69,8 @@ var   : INTEGER ID NUM {table = add(table, $2, "int", $3);
                         printf("Variable %s = %2.2f\n", $2, getFVal(table,$2));
                         $$ = $2;}
       | var '=' expr   {table = update_val(table, $1, $3);
-                        $$ = $1;}
+                        $$ = $1;
+                        printf("%s = %2.2f\n", $1, $3);}
       | ID             {$$ = $1;}
       ;
 
@@ -76,5 +80,6 @@ var   : INTEGER ID NUM {table = add(table, $2, "int", $3);
 	
 int main(void)
 {
+yyrestart(fopen(FILENAME,"r"));
       table = NULL;
   return yyparse();}
