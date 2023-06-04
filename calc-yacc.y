@@ -30,6 +30,9 @@ struct symtab* table;
 %token INTEGER
 %token DOOBLE
 %token PRINT
+%token BOOL
+%token AND
+%token OR
 
 %type <value> expr
 %type <condition> cond
@@ -39,6 +42,7 @@ struct symtab* table;
 %type <lexeme> declaration
 
 %nonassoc '='
+%left AND OR
 %left '+' '-'
 %left '*' '/'
 %left '<' '>'
@@ -61,11 +65,16 @@ expr  : expr '+' expr  {$$ = $1 + $3;}
 
 cond  : expr '<' expr  {$$ = $1 < $3;}
       | expr '>' expr  {$$ = $1 > $3;}
+      | cond AND cond  {$$ = $1 && $3;}
+      | cond OR cond   {$$ = $1 || $3;}
+      | '(' cond ')'   {$$ = $2;}
       ;
 
 assignment  : ID '=' expr   { char buf[20];
                               gcvt($3, 10, buf);
                               table = update_val_new(table, $1, buf);
+                              $$ = $1;}
+            | ID '=' cond   { table = update_val_new(table, $1, $3 ? "true":"false");
                               $$ = $1;}
       ;
 
@@ -75,6 +84,9 @@ declaration : INTEGER ID {table = add_new(table, $2, "int", "0");
             | DOOBLE ID  {table = add_new(table, $2, "float", "0.0");
                           printf("Variable %s\n", $2);
                           $$ = $2;}
+            | BOOL ID   {table = add_new(table, $2, "bool", "true");
+                         printf("Variable %s\n", $2);
+                         $$ = $2;}
       ;
 
 term  : NUM            {$$ = $1;}

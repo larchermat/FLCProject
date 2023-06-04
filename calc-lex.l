@@ -16,8 +16,11 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 [ ]     { /* skip blanks */ }
 
 if      {return IF;}
+and     {return AND;}
+or      {return OR;}
 integer {return INTEGER;}
 dooble  {return DOOBLE;}
+bool    {return BOOL;}
 print   {return PRINT;}
 {NUM}   {yylval.value = atof(yytext);
           return NUM;}

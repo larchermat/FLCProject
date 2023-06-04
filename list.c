@@ -66,6 +66,10 @@ struct symtab *add_new(struct symtab *table, char *name, char *type, char *val) 
 int getIVal(struct symtab *table, char *name) {
     empty_check(table);
     if (strcmp(table->name, name) == 0) {
+        if(strcmp(table->type, "bool") == 0){
+            fprintf(stderr, "Errore, il tipo di %s e' bool", name );
+            exit(1);
+        }
         if (strcmp(table->type, "float") == 0) {
             return (int) table->fvalue;
         }
@@ -79,6 +83,10 @@ int getIVal(struct symtab *table, char *name) {
         printf("Non è stato trovato niente per %s\n", name);
         return 0;
     }
+    if(strcmp(s->type, "bool") == 0){
+        fprintf(stderr, "Errore, il tipo di %s e' bool", name );
+        exit(1);
+    }
     if (strcmp(s->type, "float") == 0) {
         return (int) s->fvalue;
     }
@@ -88,6 +96,10 @@ int getIVal(struct symtab *table, char *name) {
 float getFVal(struct symtab *table, char *name) {
     empty_check(table);
     if (strcmp(table->name, name) == 0) {
+        if(strcmp(table->type, "bool") == 0){
+            fprintf(stderr, "Errore, il tipo di %s e' bool", name );
+            exit(1);
+        }
         if (strcmp(table->type, "int") == 0) {
             return (float) table->ivalue;
         }
@@ -100,6 +112,10 @@ float getFVal(struct symtab *table, char *name) {
     if (s == NULL) {
         printf("Non è stato trovato niente per %s\n", name);
         return 0;
+    }
+    if(strcmp(s->type, "bool") == 0){
+        fprintf(stderr, "Errore, il tipo di %s e' bool", name );
+        exit(1);
     }
     if (strcmp(s->type, "int") == 0) {
         return (float) s->ivalue;
