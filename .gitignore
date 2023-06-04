@@ -6,3 +6,6 @@ calc-yacc.*.c
 calc-yacc.*.h
 *.output
 *.out
+.idea
+cmake-build-debug
+CMakeLists.txt

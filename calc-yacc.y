@@ -63,15 +63,17 @@ cond  : expr '<' expr  {$$ = $1 < $3;}
       | expr '>' expr  {$$ = $1 > $3;}
       ;
 
-assignment  : ID '=' expr   {table = update_val(table, $1, $3);
+assignment  : ID '=' expr   { char buf[20];
+                              gcvt($3, 10, buf);
+                              table = update_val_new(table, $1, buf);
                               $$ = $1;}
       ;
 
-declaration : INTEGER ID {table = add(table, $2, "int", 0);
-                          printf("Variable %s = %d\n", $2, getIVal(table,$2));
+declaration : INTEGER ID {table = add_new(table, $2, "int", "0");
+                          printf("Variable %s\n", $2);
                           $$ = $2;}
-            | DOOBLE ID  {table = add(table, $2, "float", 0.0);
-                          printf("Variable %s = %2.2f\n", $2, getFVal(table,$2));
+            | DOOBLE ID  {table = add_new(table, $2, "float", "0.0");
+                          printf("Variable %s\n", $2);
                           $$ = $2;}
       ;
 
@@ -81,7 +83,7 @@ term  : NUM            {$$ = $1;}
 
 statement : assignment {;}
           | declaration {;}
-          | PRINT ID {printf("%s = %2.2f\n", $2, getFVal(table,$2));}
+          | PRINT ID {print_element(table,$2);}
           | PRINT {print_list(table);}
           ;
 
