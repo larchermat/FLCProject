@@ -8,4 +8,9 @@ print
 dooble z
 print
 z = x + y
-print z
+print 
+bool l
+l = x == y
+print
+l = (x + y) != (z + x)
+print 

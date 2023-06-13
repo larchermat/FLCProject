@@ -16,8 +16,11 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 [ ]     { /* skip blanks */ }
 
 if      {return IF;}
-and     {return AND;}
+&&      {return AND;}
 or      {return OR;}
+!       {return NOT;}
+!=      {return NE;}
+==      {return BE;}
 integer {return INTEGER;}
 dooble  {return DOOBLE;}
 bool    {return BOOL;}
@@ -36,6 +39,7 @@ print   {return PRINT;}
 "<"     {return '<';}
 ">"     {return '>';}
 "="     {return '=';}
+","     {return ',';}
 \n      {return '\n';}
 
 %%

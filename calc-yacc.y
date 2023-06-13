@@ -3,8 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include "list.h"
+#include <stdbool.h>
 #define FILENAME "input_file.txt"
 
 void yyerror(const char *s)
@@ -25,14 +25,17 @@ struct symtab* table;
        }
 
 %token <value>  NUM
-%token IF
+%token IF "if"
 %token <lexeme> ID
 %token INTEGER
 %token DOOBLE
 %token PRINT
 %token BOOL
-%token AND
-%token OR
+%token AND "&&"
+%token OR "||"
+%token NOT "!"
+%token NE "!="
+%token BE "=="
 
 %type <value> expr
 %type <condition> cond
@@ -41,8 +44,8 @@ struct symtab* table;
 %type <lexeme> assignment
 %type <lexeme> declaration
 
-%nonassoc '='
-%left AND OR
+%nonassoc '=' 
+%left AND OR NOT
 %left '+' '-'
 %left '*' '/'
 %left '<' '>'
@@ -65,8 +68,11 @@ expr  : expr '+' expr  {$$ = $1 + $3;}
 
 cond  : expr '<' expr  {$$ = $1 < $3;}
       | expr '>' expr  {$$ = $1 > $3;}
-      | cond AND cond  {$$ = $1 && $3;}
-      | cond OR cond   {$$ = $1 || $3;}
+      | cond "&&" cond {$$ = $1 && $3;}
+      | cond "||" cond {$$ = $1 || $3;}
+      | "!" cond       {$$ = ! $2;}
+      | expr "!=" expr {$$ = $1 != $3;}
+      | expr "==" expr {$$ = $1 == $3;}
       | '(' cond ')'   {$$ = $2;}
       ;
 
@@ -98,7 +104,6 @@ statement : assignment {;}
           | PRINT ID {print_element(table,$2);}
           | PRINT {print_list(table);}
           ;
-
 %%
 
 #include "lex.yy.c"
