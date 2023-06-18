@@ -33,6 +33,9 @@ struct symtab* table;
 %token BOOL
 %token AND
 %token OR
+%token RAD
+%token POW
+%token VS
 
 %type <value> expr
 %type <condition> cond
@@ -45,7 +48,9 @@ struct symtab* table;
 %left AND OR
 %left '+' '-'
 %left '*' '/'
+%left POW RAD
 %left '<' '>'
+%left '<=' '>='
 %right '(' ')'
 
 %start line
@@ -55,16 +60,20 @@ line  : statement '\n' {;}
       | line statement '\n'  {;}
       ;
 
-expr  : expr '+' expr  {$$ = $1 + $3;}
-      | expr '-' expr  {$$ = $1 - $3;}
-      | expr '*' expr  {$$ = $1 * $3;}
-      | expr '/' expr  {$$ = $1 / $3;}
-      | '(' expr ')'   {$$ = $2;}
-      | term           {$$ = $1;}
+expr  : expr '+' expr               {$$ = $1 + $3;}
+      | expr '-' expr               {$$ = $1 - $3;}
+      | expr '*' expr               {$$ = $1 * $3;}
+      | expr '/' expr               {$$ = $1 / $3;}
+      | POW '(' expr VS expr ')'    {$$ = pow($3, $5);}
+      | RAD '(' expr VS expr ')'    {$$ = pow($3, 1/$5);}   //let you chose the root to be calculated (square root, cubic root, etc..)
+      | '(' expr ')'                {$$ = $2;}
+      | term                        {$$ = $1;}
       ;
 
 cond  : expr '<' expr  {$$ = $1 < $3;}
       | expr '>' expr  {$$ = $1 > $3;}
+      | expr '<=' expr {$$ = $1 <= $3;}
+      | expr '>=' expr {$$ = $1 >= $3;}
       | cond AND cond  {$$ = $1 && $3;}
       | cond OR cond   {$$ = $1 || $3;}
       | '(' cond ')'   {$$ = $2;}
