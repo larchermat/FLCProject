@@ -3,8 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include "list.h"
 #include <stdbool.h>
+#include "list.h"
 #define FILENAME "input_file.txt"
 
 void yyerror(const char *s)
@@ -31,6 +31,9 @@ struct symtab* table;
 %token DOOBLE
 %token PRINT
 %token BOOL
+%token RAD
+%token POW
+%token VS
 %token AND "&&"
 %token OR "||"
 %token NOT "!"
@@ -44,11 +47,13 @@ struct symtab* table;
 %type <lexeme> assignment
 %type <lexeme> declaration
 
-%nonassoc '=' 
+%nonassoc '='
 %left AND OR NOT
 %left '+' '-'
 %left '*' '/'
+%left POW RAD
 %left '<' '>'
+%left '<=' '>='
 %right '(' ')'
 
 %start line
@@ -58,12 +63,14 @@ line  : statement '\n' {;}
       | line statement '\n'  {;}
       ;
 
-expr  : expr '+' expr  {$$ = $1 + $3;}
-      | expr '-' expr  {$$ = $1 - $3;}
-      | expr '*' expr  {$$ = $1 * $3;}
-      | expr '/' expr  {$$ = $1 / $3;}
-      | '(' expr ')'   {$$ = $2;}
-      | term           {$$ = $1;}
+expr  : expr '+' expr               {$$ = $1 + $3;}
+      | expr '-' expr               {$$ = $1 - $3;}
+      | expr '*' expr               {$$ = $1 * $3;}
+      | expr '/' expr               {$$ = $1 / $3;}
+      | POW '(' expr VS expr ')'    {$$ = pow($3, $5);}
+      | RAD '(' expr VS expr ')'    {$$ = pow($3, 1/$5);}   //let you chose the root to be calculated (square root, cubic root, etc..)
+      | '(' expr ')'                {$$ = $2;}
+      | term                        {$$ = $1;}
       ;
 
 cond  : expr '<' expr  {$$ = $1 < $3;}
@@ -73,6 +80,8 @@ cond  : expr '<' expr  {$$ = $1 < $3;}
       | "!" cond       {$$ = ! $2;}
       | expr "!=" expr {$$ = $1 != $3;}
       | expr "==" expr {$$ = $1 == $3;}
+      | expr '<=' expr {$$ = $1 <= $3;}
+      | expr '>=' expr {$$ = $1 >= $3;}
       | '(' cond ')'   {$$ = $2;}
       ;
 

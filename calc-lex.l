@@ -2,6 +2,7 @@
 %{
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 %}
 
 DIGIT    [0-9]
@@ -21,6 +22,8 @@ or      {return OR;}
 !       {return NOT;}
 !=      {return NE;}
 ==      {return BE;}
+rad     {return RAD;}
+pow     {return POW;}
 integer {return INTEGER;}
 dooble  {return DOOBLE;}
 bool    {return BOOL;}
@@ -39,7 +42,9 @@ print   {return PRINT;}
 "<"     {return '<';}
 ">"     {return '>';}
 "="     {return '=';}
-","     {return ',';}
+"<="    {return '<='}
+">="    {return '>='}
+","     {return 'VS'}
 \n      {return '\n';}
 
 %%
