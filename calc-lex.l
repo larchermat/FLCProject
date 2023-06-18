@@ -2,7 +2,6 @@
 %{
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 %}
 
 DIGIT    [0-9]
@@ -16,16 +15,18 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 
 [ ]     { /* skip blanks */ }
 
-if      {return IF;}
 &&      {return AND;}
 or      {return OR;}
 !       {return NOT;}
 !=      {return NE;}
 ==      {return BE;}
+"<="      {return LE;}
+>=      {return GE;}
+,       {return VS;}
 rad     {return RAD;}
 pow     {return POW;}
 integer {return INTEGER;}
-dooble  {return DOOBLE;}
+float  {return FLOAT;}
 bool    {return BOOL;}
 print   {return PRINT;}
 {NUM}   {yylval.value = atof(yytext);
@@ -42,9 +43,7 @@ print   {return PRINT;}
 "<"     {return '<';}
 ">"     {return '>';}
 "="     {return '=';}
-"<="    {return '<='}
-">="    {return '>='}
-","     {return 'VS'}
+":"     {return ':';}
 \n      {return '\n';}
 
 %%

@@ -3,34 +3,7 @@
 #include <stdio.h>
 #include "list.h"
 
-struct symtab *create_table(char *name, char *type, float val) {
-    struct symtab *table = (struct symtab *) malloc(sizeof(struct symtab));
-    strcpy(table->name, name);
-    strcpy(table->type, type);
-    if (strcmp(type, "int") == 0) {
-        table->ivalue = (int) val;
-    } else {
-        table->fvalue = val;
-    }
-    table->next = NULL;
-    return table;
-}
-
-struct symtab *add(struct symtab *table, char *name, char *type, float val) {
-    struct symtab *element = create_table(name, type, val);
-    if (table == NULL) {
-        return element;
-    }
-    struct symtab *s = table;
-    dup_check(table, name);
-    while (s->next != NULL) {
-        s = s->next;
-    }
-    s->next = element;
-    return table;
-}
-
-struct symtab *create_table_new(char *name, char *type, char *val) {
+struct symtab *create_table(char *name, char *type, char *val) {
     struct symtab *table = (struct symtab *) malloc(sizeof(struct symtab));
     strcpy(table->name, name);
     strcpy(table->type, type);
@@ -50,7 +23,7 @@ struct symtab *create_table_new(char *name, char *type, char *val) {
 }
 
 struct symtab *add_new(struct symtab *table, char *name, char *type, char *val) {
-    struct symtab *element = create_table_new(name, type, val);
+    struct symtab *element = create_table(name, type, val);
     if (table == NULL) {
         return element;
     }
@@ -63,41 +36,11 @@ struct symtab *add_new(struct symtab *table, char *name, char *type, char *val) 
     return table;
 }
 
-int getIVal(struct symtab *table, char *name) {
-    empty_check(table);
-    if (strcmp(table->name, name) == 0) {
-        if(strcmp(table->type, "bool") == 0){
-            fprintf(stderr, "Errore, il tipo di %s e' bool", name );
-            exit(1);
-        }
-        if (strcmp(table->type, "float") == 0) {
-            return (int) table->fvalue;
-        }
-        return table->ivalue;
-    }
-    struct symtab *s = table;
-    while (s != NULL && strcmp(name, s->name) != 0) {
-        s = s->next;
-    }
-    if (s == NULL) {
-        printf("Non è stato trovato niente per %s\n", name);
-        return 0;
-    }
-    if(strcmp(s->type, "bool") == 0){
-        fprintf(stderr, "Errore, il tipo di %s e' bool", name );
-        exit(1);
-    }
-    if (strcmp(s->type, "float") == 0) {
-        return (int) s->fvalue;
-    }
-    return s->ivalue;
-}
-
 float getFVal(struct symtab *table, char *name) {
     empty_check(table);
     if (strcmp(table->name, name) == 0) {
-        if(strcmp(table->type, "bool") == 0){
-            fprintf(stderr, "Errore, il tipo di %s e' bool", name );
+        if (strcmp(table->type, "bool") == 0) {
+            fprintf(stderr, "Errore, il tipo di %s e' bool", name);
             exit(1);
         }
         if (strcmp(table->type, "int") == 0) {
@@ -113,8 +56,8 @@ float getFVal(struct symtab *table, char *name) {
         printf("Non è stato trovato niente per %s\n", name);
         return 0;
     }
-    if(strcmp(s->type, "bool") == 0){
-        fprintf(stderr, "Errore, il tipo di %s e' bool", name );
+    if (strcmp(s->type, "bool") == 0) {
+        fprintf(stderr, "Errore, il tipo di %s e' bool", name);
         exit(1);
     }
     if (strcmp(s->type, "int") == 0) {
@@ -140,40 +83,14 @@ bool getBVal(struct symtab *table, char *name) {
         printf("Non è stato trovato niente per %s\n", name);
         return 0;
     }
-    if (strcmp(table->type, "bool") != 0) {
-        fprintf(stderr, "Tipi incompatibili: %s e bool", table->type);
+    if (strcmp(s->type, "bool") != 0) {
+        fprintf(stderr, "Tipi incompatibili: %s e bool", s->type);
         exit(1);
     }
-    return table->bvalue;
+    return s->bvalue;
 }
 
-struct symtab *update_val(struct symtab *table, char *name, float value) {
-    empty_check(table);
-    if (strcmp(table->name, name) == 0) {
-        if (strcmp(table->type, "float") == 0) {
-            table->fvalue = value;
-        } else {
-            table->ivalue = (int) value;
-        }
-        return table;
-    }
-    struct symtab *s = table;
-    while (s != NULL && strcmp(name, s->name) != 0) {
-        s = s->next;
-    }
-    if (s == NULL) {
-        printf("Non è stato trovato niente per %s\n", name);
-        return table;
-    }
-    if (strcmp(s->type, "float") == 0) {
-        s->fvalue = value;
-    } else {
-        s->ivalue = (int) value;
-    }
-    return table;
-}
-
-struct symtab *update_val_new(struct symtab *table, char *name, char *value) {
+struct symtab *update_val(struct symtab *table, char *name, char *value) {
     empty_check(table);
     if (strcmp(table->name, name) == 0) {
         type_check(table->type, value);
@@ -219,9 +136,9 @@ void print_list(struct symtab *table) {
     while (s != NULL) {
         if (strcmp(s->type, "float") == 0) {
             printf("%s = %2.2f\n", s->name, s->fvalue);
-        } else if(strcmp(s->type, "int") == 0){
+        } else if (strcmp(s->type, "int") == 0) {
             printf("%s = %d\n", s->name, s->ivalue);
-        } else{
+        } else {
             if (s->bvalue == true) {
                 printf("%s = true\n", s->name);
             } else {
@@ -244,9 +161,9 @@ void print_element(struct symtab *table, char *name) {
     } else {
         if (strcmp(s->type, "float") == 0) {
             printf("%s = %2.2f\n", s->name, s->fvalue);
-        } else if(strcmp(s->type, "int") == 0){
+        } else if (strcmp(s->type, "int") == 0) {
             printf("%s = %d\n", s->name, s->ivalue);
-        } else{
+        } else {
             if (s->bvalue == true) {
                 printf("%s = true\n", s->name);
             } else {
@@ -258,7 +175,7 @@ void print_element(struct symtab *table, char *name) {
 
 void empty_check(struct symtab *table) {
     if (table == NULL) {
-        fprintf(stderr, "List is empty\n");
+        fprintf(stderr, "La lista è vuota\n");
         exit(1);
     }
 }
@@ -270,18 +187,18 @@ void dup_check(struct symtab *table, char *name) {
         s = s->next;
     }
     if (s != NULL) {
-        fprintf(stderr, "Cannot have two entries with the same name: %s\n", name);
+        fprintf(stderr, "Non puoi avere due variabili con lo stesso nome: %s\n", name);
         exit(1);
     }
 }
 
-void type_check(char* type, char* value){
-    if(strcmp(type, "bool") == 0){
-        if(strcmp(value, "true") != 0 && strcmp(value, "false") != 0){
+void type_check(char *type, char *value) {
+    if (strcmp(type, "bool") == 0) {
+        if (strcmp(value, "true") != 0 && strcmp(value, "false") != 0) {
             fprintf(stderr, "Tipo richiesto bool, valore inserito %s\n", value);
             exit(1);
         }
-    } else if(strcmp(value, "true") == 0 || strcmp(value, "false") == 0){
+    } else if (strcmp(value, "true") == 0 || strcmp(value, "false") == 0) {
         fprintf(stderr, "Tipo richiesto %s, valore inserito %s\n", type, value);
         exit(1);
     }

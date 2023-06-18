@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 #include "list.h"
 #define FILENAME "input_file.txt"
 
@@ -25,10 +26,9 @@ struct symtab* table;
        }
 
 %token <value>  NUM
-%token IF "if"
 %token <lexeme> ID
 %token INTEGER
-%token DOOBLE
+%token FLOAT
 %token PRINT
 %token BOOL
 %token RAD
@@ -39,10 +39,13 @@ struct symtab* table;
 %token NOT "!"
 %token NE "!="
 %token BE "=="
+%token LE "<="
+%token GE ">="
 
 %type <value> expr
 %type <condition> cond
 %type <value> term
+%type <condition> condTerm
 %type <lexeme> statement
 %type <lexeme> assignment
 %type <lexeme> declaration
@@ -53,7 +56,7 @@ struct symtab* table;
 %left '*' '/'
 %left POW RAD
 %left '<' '>'
-%left '<=' '>='
+%left LE GE
 %right '(' ')'
 
 %start line
@@ -68,7 +71,7 @@ expr  : expr '+' expr               {$$ = $1 + $3;}
       | expr '*' expr               {$$ = $1 * $3;}
       | expr '/' expr               {$$ = $1 / $3;}
       | POW '(' expr VS expr ')'    {$$ = pow($3, $5);}
-      | RAD '(' expr VS expr ')'    {$$ = pow($3, 1/$5);}   //let you chose the root to be calculated (square root, cubic root, etc..)
+      | RAD '(' expr VS expr ')'    {$$ = pow($3, 1/$5);}
       | '(' expr ')'                {$$ = $2;}
       | term                        {$$ = $1;}
       ;
@@ -80,23 +83,24 @@ cond  : expr '<' expr  {$$ = $1 < $3;}
       | "!" cond       {$$ = ! $2;}
       | expr "!=" expr {$$ = $1 != $3;}
       | expr "==" expr {$$ = $1 == $3;}
-      | expr '<=' expr {$$ = $1 <= $3;}
-      | expr '>=' expr {$$ = $1 >= $3;}
+      | expr LE expr {$$ = $1 <= $3;}
+      | expr GE expr {$$ = $1 >= $3;}
       | '(' cond ')'   {$$ = $2;}
+      | condTerm       {$$ = $1;}
       ;
 
 assignment  : ID '=' expr   { char buf[20];
                               gcvt($3, 10, buf);
-                              table = update_val_new(table, $1, buf);
+                              table = update_val(table, $1, buf);
                               $$ = $1;}
-            | ID '=' cond   { table = update_val_new(table, $1, $3 ? "true":"false");
+            | ID '=' cond   { table = update_val(table, $1, $3 ? "true":"false");
                               $$ = $1;}
       ;
 
 declaration : INTEGER ID {table = add_new(table, $2, "int", "0");
                           printf("Variable %s\n", $2);
                           $$ = $2;}
-            | DOOBLE ID  {table = add_new(table, $2, "float", "0.0");
+            | FLOAT ID  {table = add_new(table, $2, "float", "0.0");
                           printf("Variable %s\n", $2);
                           $$ = $2;}
             | BOOL ID   {table = add_new(table, $2, "bool", "true");
@@ -107,6 +111,9 @@ declaration : INTEGER ID {table = add_new(table, $2, "int", "0");
 term  : NUM            {$$ = $1;}
       | ID             {$$ = getFVal(table,$1);}
       ;
+
+condTerm : ID ':'       {$$ = getBVal(table,$1);}
+         ;
 
 statement : assignment {;}
           | declaration {;}
