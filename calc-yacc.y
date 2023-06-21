@@ -28,6 +28,7 @@ struct symtab* table;
 %token <value>  NUM
 %token <lexeme> ID
 %token <lexeme> BOOLEAN
+%token IF
 %token INTEGER
 %token FLOAT
 %token PRINT
@@ -75,6 +76,7 @@ expr  : expr '+' expr               {$$ = $1 + $3;}
       | RAD '(' expr VS expr ')'    {$$ = pow($3, 1/$5);}
       | '(' expr ')'                {$$ = $2;}
       | term                        {$$ = $1;}
+      | IF '(' cond ')' term ':' term {$$ = $3? $5:$7;}
       ;
 
 cond  : expr '<' expr  {$$ = $1 < $3;}
@@ -114,6 +116,7 @@ term  : NUM            {$$ = $1;}
       ;
 
 condTerm : ID ':'       {$$ = getBVal(table,$1);}
+         | BOOLEAN      {$$ = strcmp($1, "true") == 0 ? true : false;}
          ;
 
 statement : assignment {;}

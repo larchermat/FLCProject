@@ -7,12 +7,10 @@
 DIGIT    [0-9]
 NUM      {DIGIT}+(\.{DIGIT}+)?
 
-BOOLEAN  [true|false]
-
 LETTER   [a-zA-Z]
 ID       {LETTER}({LETTER}|{DIGIT})*
 
-
+BOOLEAN  (true|false)
 
 %%
 
@@ -20,6 +18,7 @@ ID       {LETTER}({LETTER}|{DIGIT})*
 
 &&      {return AND;}
 or      {return OR;}
+if      {return IF;}
 !       {return NOT;}
 !=      {return NE;}
 ==      {return BE;}
@@ -34,10 +33,10 @@ bool    {return BOOL;}
 print   {return PRINT;}
 {NUM}   {yylval.value = atof(yytext);
           return NUM;}
+{BOOLEAN}   {yylval.lexeme = strdup(yytext);
+            return BOOLEAN;}
 {ID}    {yylval.lexeme = strdup(yytext);
           return ID;}
-{BOOLEAN}   {yylval.lexeme = strdup(yytext);
-              return BOOLEAN;}
 
 "+"     {return '+';}
 "-"     {return '-';}
