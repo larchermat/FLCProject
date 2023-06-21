@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include "list.h"
-#define FILENAME "input_file.txt"
+#define FILENAME "input_file.txt" //nome del file di testo da cui lexer andra' a leggere
 
 void yyerror(const char *s)
 {
@@ -15,19 +15,20 @@ void yyerror(const char *s)
 }
 
 int yylex(void);
-struct symtab* table;
+struct symtab* table;         //dichiarazione della symbol table utilizzata dal compilatore
  
 %}
 
 %union {
-       char* lexeme;			//name of an identifier
-       float value;			//attribute of a token of type NUM
+       char* lexeme;
+       float value;
        bool condition;
        }
 
 %token <value>  NUM
 %token <lexeme> ID
 %token <lexeme> BOOLEAN
+%token IF
 %token INTEGER
 %token FLOAT
 %token PRINT
@@ -75,6 +76,7 @@ expr  : expr '+' expr               {$$ = $1 + $3;}
       | RAD '(' expr VS expr ')'    {$$ = pow($3, 1/$5);}
       | '(' expr ')'                {$$ = $2;}
       | term                        {$$ = $1;}
+      | IF '(' cond ')' term ':' term {$$ = $3? $5:$7;}
       ;
 
 cond  : expr '<' expr  {$$ = $1 < $3;}
@@ -113,9 +115,9 @@ term  : NUM            {$$ = $1;}
       | ID             {$$ = getFVal(table,$1);}
       ;
 
-condTerm    : ID ':'       {$$ = getBVal(table,$1);}
-            | BOOL
-            ;
+condTerm : ID ':'       {$$ = getBVal(table,$1);}
+         | BOOLEAN      {$$ = strcmp($1, "true") == 0 ? true : false;}
+         ;
 
 statement : assignment {;}
           | declaration {;}
@@ -128,6 +130,6 @@ statement : assignment {;}
 	
 int main(void)
 {
-yyrestart(fopen(FILENAME,"r"));
-      table = NULL;
+yyrestart(fopen(FILENAME,"r")); //istruzione che serve a far cambiare il file di input da cui leggere
+      table = NULL; //inizializzazione della symbol table a NULL
   return yyparse();}
