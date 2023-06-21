@@ -6,7 +6,7 @@
 #include <stdbool.h>
 #include <math.h>
 #include "list.h"
-#define FILENAME "input_file.txt"
+#define FILENAME "input_file.txt" //nome del file di testo da cui lexer andra' a leggere
 
 void yyerror(const char *s)
 {
@@ -15,13 +15,13 @@ void yyerror(const char *s)
 }
 
 int yylex(void);
-struct symtab* table;
+struct symtab* table;         //dichiarazione della symbol table utilizzata dal compilatore
  
 %}
 
 %union {
-       char* lexeme;			//name of an identifier
-       float value;			//attribute of a token of type NUM
+       char* lexeme;
+       float value;
        bool condition;
        }
 
@@ -130,6 +130,6 @@ statement : assignment {;}
 	
 int main(void)
 {
-yyrestart(fopen(FILENAME,"r"));
-      table = NULL;
+yyrestart(fopen(FILENAME,"r")); //istruzione che serve a far cambiare il file di input da cui leggere
+      table = NULL; //inizializzazione della symbol table a NULL
   return yyparse();}
