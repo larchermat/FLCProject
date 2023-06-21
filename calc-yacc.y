@@ -27,6 +27,7 @@ struct symtab* table;
 
 %token <value>  NUM
 %token <lexeme> ID
+%token <lexeme> BOOLEAN
 %token INTEGER
 %token FLOAT
 %token PRINT
