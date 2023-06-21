@@ -113,8 +113,9 @@ term  : NUM            {$$ = $1;}
       | ID             {$$ = getFVal(table,$1);}
       ;
 
-condTerm : ID ':'       {$$ = getBVal(table,$1);}
-         ;
+condTerm    : ID ':'       {$$ = getBVal(table,$1);}
+            | BOOL
+            ;
 
 statement : assignment {;}
           | declaration {;}
