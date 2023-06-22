@@ -53,6 +53,7 @@ struct symtab* table;         //dichiarazione della symbol table utilizzata dal 
 %type <lexeme> declaration
 
 %nonassoc '='
+%nonassoc ':'
 %left AND OR NOT
 %left '+' '-'
 %left '*' '/'
@@ -76,7 +77,7 @@ expr  : expr '+' expr               {$$ = $1 + $3;}
       | RAD '(' expr VS expr ')'    {$$ = pow($3, 1/$5);}
       | '(' expr ')'                {$$ = $2;}
       | term                        {$$ = $1;}
-      | IF '(' cond ')' term ':' term {$$ = $3? $5:$7;}
+      | IF '(' cond ')' expr ':' expr {$$ = $3? $5:$7;}
       ;
 
 cond  : expr '<' expr  {$$ = $1 < $3;}
